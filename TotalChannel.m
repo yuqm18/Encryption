@@ -34,15 +34,15 @@ classdef TotalChannel
             fs = obj.SampleRate;
             rs = obj.SymbolRate;
             alpha = 0.5;
-            
-            Vol = reshape(DataIn,[],2);
+            DataIn = reshape(DataIn,1,[]);
+            Vol = reshape(DataIn,2,[])';
             Vol = bi2de(Vol);
             Vol = bin2gray(Vol,'psk',4);
-            Vol = exp(1j*(1+2*Vol)/4*pi);
+            Vol = exp(1j*(2*Vol)/4*pi);
             Tsymbol = (0:length(Vol)-1)'/rs;            
             T0 = (length(Vol)+20)/rs;
             
-            Tg = 20/rs;     % G(t) duration
+            Tg = 100/rs;     % G(t) duration
             Ng = fs*Tg;         
             freq = [0:ceil(Ng/2)-1,-floor(Ng/2):-1]'/Tg;
             
