@@ -3,11 +3,13 @@ close all
 
 
 Channel = TotalChannel();
+Channel.ConvCode = ConvCode([11 13 15]);
+
 
 %data = repmat([1;zeros(1000,1)],10,1);
-nN0 = 10;
-rep = 100;
-EbByN0 = 15.^linspace(-4,1,nN0);
+nN0 = 20;
+rep = 50;
+EbByN0 = 10.^linspace(-1,1,nN0);
 ErrorRate = zeros(nN0,rep);
 for n = 1:rep
     data = rand(8192,1)<0.5;

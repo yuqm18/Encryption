@@ -1,9 +1,10 @@
 classdef ConvCode
     properties 
         Poly
-        nm
-        EndType
+        nm              %n m+1
+        EndType         %是否收尾
         WindowSize
+        HardOrSoft      % hard 0, soft 1
         
     end
     methods
@@ -12,16 +13,20 @@ classdef ConvCode
             obj.Poly = PolyIn;
             obj.EndType = 1;
             obj.WindowSize = Inf;
+            obj.HardOrSoft = 1;
             if nargin==1
                 obj.nm(1) = length(PolyIn);
                 obj.nm(2) = ceil(log2(max(PolyIn)));
                 
-            elseif nargin == 2
+            elseif nargin >= 2
                 obj.nm = varargin{1};
-                if nargin == 3
+                if nargin >= 3
                     obj.EndType = varargin{2};
-                    if nargin == 4
+                    if nargin >= 4
                         obj.WindowSize = varargin{3};
+                        if nargin>=5
+                            obj.HardOrSoft = varargin{4};
+                        end
                     end
                 end
             end
@@ -76,7 +81,11 @@ classdef ConvCode
             if size(est,2)==2^n
                 est = est';
             end
-
+            
+            if ~obj.HardOrSoft
+                est = obj.Hard(est);
+            end
+            
             End = obj.EndType;
 
             
@@ -181,9 +190,24 @@ classdef ConvCode
 
             end
             info_out = [info_out;Tail'];
-
+            info_out(1:mp-1) = [];
 
         end    
+        
+        function estout = Hard(obj,est)
+            N = size(est,1);
+            
+            [x,y] = meshgrid(0:N-1,0:N-1);
+            x = reshape(x,[],1);
+            y = reshape(y,[],1);
+            x = de2bi(x);
+            y = de2bi(y);
+            DH = reshape(sum(x~=y,2),N,N);     % Hamming Distance Matrix            
+            
+            [~,maxpos] = max(est,[],1);
+            estout = repmat((1:N)',1,size(est,2));
+            estout = DH(estout-1,maxpos-1);
+        end
         
     end
     
